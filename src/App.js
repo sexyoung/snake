@@ -1,24 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import ReactResizeDetector from 'react-resize-detector';
+
+import style from './App.module.scss';
+
+const boxLen = 50;
 
 function App() {
+
+  const [colCount, setColCount] = useState(0);
+  const [rowCount, setRowCount] = useState(0);
+
+  const handleResize = (width, height) => {
+    setColCount(~~(width / boxLen));
+    setRowCount(~~(height / boxLen));
+  }
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={style.App}>
+      <div className={style.header}>
+        0
+      </div>
+      <ReactResizeDetector
+        handleWidth
+        handleHeight
+        onResize={handleResize}
+      >
+        {() =>
+          <div className={style.grid}>
+            {
+              (!colCount || !rowCount) ? null:
+              [...Array(1).keys()].map(row =>
+                <div key={row}>
+                  {[...Array(1).keys()].map(col =>
+                    <div key={col} style={{
+                      width: boxLen,
+                      height: boxLen,
+                    }} className={style.box} />
+                  )}
+                </div>
+              )
+            }
+          </div>
+        }
+      </ReactResizeDetector>
     </div>
   );
 }
