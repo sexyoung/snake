@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import ReactResizeDetector from 'react-resize-detector';
+import React, { useState, useEffect } from 'react';
 
 import style from './App.module.scss';
 
@@ -10,39 +9,34 @@ function App() {
   const [colCount, setColCount] = useState(0);
   const [rowCount, setRowCount] = useState(0);
 
-  const handleResize = (width, height) => {
-    setColCount(~~(width / boxLen));
-    setRowCount(~~(height / boxLen));
-  }
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+  }, []);
+
+  const handleResize = ({ target }) => {
+    console.warn(target);
+  };
   
   return (
     <div className={style.App}>
       <div className={style.header}>
         0
       </div>
-      <ReactResizeDetector
-        handleWidth
-        handleHeight
-        onResize={handleResize}
-      >
-        {() =>
-          <div className={style.grid}>
-            {
-              (!colCount || !rowCount) ? null:
-              [...Array(1).keys()].map(row =>
-                <div key={row}>
-                  {[...Array(1).keys()].map(col =>
-                    <div key={col} style={{
-                      width: boxLen,
-                      height: boxLen,
-                    }} className={style.box} />
-                  )}
-                </div>
-              )
-            }
-          </div>
+      <div className={style.grid}>
+        {
+          (!colCount || !rowCount) ? null:
+          [...Array(rowCount).keys()].map(row =>
+            <div key={row} className={style.row}>
+              {[...Array(colCount).keys()].map(col =>
+                <div key={col} style={{
+                  width: boxLen,
+                  height: boxLen,
+                }} className={style.box} />
+              )}
+            </div>
+          )
         }
-      </ReactResizeDetector>
+      </div>
     </div>
   );
 }
