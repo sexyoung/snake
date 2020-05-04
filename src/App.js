@@ -1,3 +1,6 @@
+import { interval } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { useObservable } from "rxjs-hooks";
 import React, { useState, useEffect, createRef } from 'react';
 
 import style from './App.module.scss';
@@ -26,11 +29,16 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [appDOM, headerDOM]);
+
+  const value = useObservable(() => interval(500).pipe(
+    map((val) => val * 1),
+    tap(console.warn)
+  ));
   
   return (
     <div className={style.App} ref={appDOM}>
       <div className={style.header} ref={headerDOM}>
-        0
+        {value}
       </div>
       <div className={style.grid}>
         {
