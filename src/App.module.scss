@@ -10,25 +10,33 @@
   }
   .grid {
     height: 100%;
-    background-color: #ff0;
+    // background-color: #ff0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .row {
     display: flex;
     justify-content: center;
-    // border: 1px solid red;
-  }
 
-  .box {
-    // width: 25px;
-    // height: 25px;
-    // display: flex;
-    background-color: #f00;
+    &:nth-of-type(odd) .box:nth-of-type(odd),
+    &:nth-of-type(even) .box:nth-of-type(even)
+    {
+      background-color: #a7d948;
+    }
+
+    &:nth-of-type(odd) .box:nth-of-type(even),
+    &:nth-of-type(even) .box:nth-of-type(odd)
+    {
+      background-color: #8ecc39;
+    }
   }
 
   @media screen and (min-width: 501px) {
     max-width: 900px;
-    max-height: 650px;
+    max-height: 657px;
     border: 1px solid #999;
     width: calc(100% - 60px);
     height: calc(100% - 60px);
