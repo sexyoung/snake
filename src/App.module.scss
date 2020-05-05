@@ -10,11 +10,12 @@
   }
   .grid {
     height: 100%;
-    // background-color: #ff0;
-
     display: flex;
+    position: relative;
     flex-direction: column;
     justify-content: center;
+
+    /* components/Snake */
   }
 
   .row {
