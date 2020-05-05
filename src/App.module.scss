@@ -13,7 +13,7 @@
     display: flex;
     position: relative;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
 
     /* components/Snake */
   }
@@ -37,7 +37,7 @@
 
   @media screen and (min-width: 501px) {
     max-width: 900px;
-    max-height: 657px;
+    max-height: 615px;
     border: 1px solid #999;
     width: calc(100% - 60px);
     height: calc(100% - 60px);

@@ -1,15 +1,33 @@
-import { interval, combineLatest, of } from "rxjs";
-import { scan, take, distinctUntilChanged, tap, map } from "rxjs/operators";
-import { useObservable } from "rxjs-hooks";
-import React, { useState, useEffect, createRef } from 'react';
+import {
+  of,
+  empty,
+  timer,
+  combineLatest,
+} from "rxjs";
+
+import {
+  tap,
+  map,
+  scan,
+  mapTo,
+  startWith,
+  distinctUntilChanged,
+  switchMap,
+} from "rxjs/operators";
+
+import {
+  useObservable,
+  useEventCallback,
+} from "rxjs-hooks";
+
+import React, { useState, useEffect, useRef } from 'react';
 
 import Snake from 'components/Snake';
 
 import style from './App.module.scss';
+import snakeStyle from 'components/Snake/style.module.scss';
 
 export const boxLen = 50;
-const appDOM = createRef();
-const headerDOM = createRef();
 
 const DIRECTION_MAP = {
   RIGHT: 1,
@@ -29,14 +47,35 @@ const KEY_MAP = {
   '40': 'DOWN',
 }
 
-let coordinate = 0;
+const INIT_COORDINATE = 0;
+let coordinate = INIT_COORDINATE;
 let currDirection = DIRECTION_MAP.RIGHT;
 
-let time$ = interval(500);
-let coordinate$ = of(coordinate);
-let tickSnake$ = combineLatest(coordinate$, time$);
+const time$ = timer(0, +snakeStyle.duration);
+
+const tickSnake$ = time$.pipe(
+  mapTo(coordinate),
+  scan((c) => {
+    return currDirection + (
+      c === INIT_COORDINATE && coordinate !== INIT_COORDINATE ?
+      coordinate: c
+    );
+  }, INIT_COORDINATE),
+  distinctUntilChanged(),
+  tap(value =>
+    coordinate = value
+  ),
+  tap((c) => console.log('位置', c)),
+  // stop on coordinate < 0
+);
 
 function App() {
+
+  const appDOM = useRef();
+  const headerDOM = useRef();
+
+  // const coordinate$ = of(coordinate);
+  const [isPause, setIsPause] = useState(true);
 
   const [gridSize, setGridSize] = useState({
     colCount: 0,
@@ -51,12 +90,14 @@ function App() {
   };
 
   const handleKeyDown = (e) => {
-    currDirection = DIRECTION_MAP[KEY_MAP[e.keyCode]];
+    if(KEY_MAP.hasOwnProperty(e.keyCode))
+      currDirection = DIRECTION_MAP[KEY_MAP[e.keyCode]];
   }
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     document.addEventListener("keydown", handleKeyDown);
+
     handleResize();
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -64,18 +105,25 @@ function App() {
     }
   }, []);
 
-  coordinate = useObservable(() => tickSnake$.pipe(
-    map(([x]) => x),
-    scan((coordinate) => coordinate + currDirection),
-    distinctUntilChanged(),
-    tap(console.log)
-    // stop on coordinate < 0
-  ));
+  // coordinate = useObservable(() => tickSnake$);
+
+  const [handleTogglePause] = useEventCallback((event$) =>
+    event$.pipe(
+      scan(isPause => !isPause, isPause),
+      tap(setIsPause),
+      switchMap(isPause => isPause ? empty(): tickSnake$),
+      // tap(console.log),
+    ),
+    INIT_COORDINATE,
+  );
   
   return (
     <div className={style.App} ref={appDOM}>
       <div className={style.header} ref={headerDOM}>
         0
+        <button onClick={handleTogglePause}>
+          {isPause ? 'play': 'pause'}
+        </button>
       </div>
       <div className={style.grid}>
         {
@@ -94,8 +142,7 @@ function App() {
         {coordinate !== null &&
           <Snake {...{
             coordinate,
-            }}
-          />
+          }} />
         }
       </div>
     </div>
