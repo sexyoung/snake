@@ -1,35 +1,27 @@
 import {
-  of,
   empty,
   timer,
-  combineLatest,
 } from "rxjs";
 
 import {
   tap,
-  map,
   scan,
   mapTo,
-  startWith,
-  distinctUntilChanged,
   switchMap,
+  distinctUntilChanged,
 } from "rxjs/operators";
 
 import {
-  useObservable,
   useEventCallback,
 } from "rxjs-hooks";
 
 import React, { useState, useEffect, useRef } from 'react';
 
-import Snake from 'components/Snake';
+import Snake, { duration, boxLen } from 'components/Snake';
 
 import style from './App.module.scss';
-import snakeStyle from 'components/Snake/style.module.scss';
 
-export const boxLen = 50;
-
-const DIRECTION_MAP = {
+export const DIRECTION_MAP = {
   RIGHT: 1,
   LEFT: -1,
   DOWN: 100,
@@ -51,7 +43,7 @@ const INIT_COORDINATE = 0;
 let coordinate = INIT_COORDINATE;
 let currDirection = DIRECTION_MAP.RIGHT;
 
-const time$ = timer(0, +snakeStyle.duration);
+const time$ = timer(0, duration);
 
 const tickSnake$ = time$.pipe(
   mapTo(coordinate),
@@ -74,7 +66,6 @@ function App() {
   const appDOM = useRef();
   const headerDOM = useRef();
 
-  // const coordinate$ = of(coordinate);
   const [isPause, setIsPause] = useState(true);
 
   const [gridSize, setGridSize] = useState({
@@ -104,8 +95,6 @@ function App() {
       document.removeEventListener("keydown", handleKeyDown);
     }
   }, []);
-
-  // coordinate = useObservable(() => tickSnake$);
 
   const [handleTogglePause] = useEventCallback((event$) =>
     event$.pipe(
@@ -142,6 +131,7 @@ function App() {
         {coordinate !== null &&
           <Snake {...{
             coordinate,
+            direction: currDirection,
           }} />
         }
       </div>
