@@ -9,9 +9,12 @@ export const boxLen = +style.boxLen;
 export const duration = +style.duration;
 
 export default function Snake({ coordinate, direction }) {
-  
-  const left = (coordinate % 100) * boxLen;
+
+
+  const left = (((coordinate % 100) + 100) % 100) * boxLen;
   const top = ~~(coordinate / 100) * boxLen;
+
+  console.warn(coordinate, left);
 
   return (
     <div className={style.SnakeWrapper} style={{

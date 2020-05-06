@@ -40,6 +40,8 @@ const KEY_MAP = {
 }
 
 const INIT_COORDINATE = 0;
+let colCount = 0;
+let rowCount = 0;
 let coordinate = INIT_COORDINATE;
 let currDirection = DIRECTION_MAP.RIGHT;
 
@@ -57,7 +59,18 @@ const tickSnake$ = time$.pipe(
   tap(value =>
     coordinate = value
   ),
-  tap((c) => console.log('位置', c)),
+  tap(coordinate => {
+    console.log(
+      '位置', coordinate,
+      'colCount', colCount,
+      'rowCount', rowCount,
+      '是否越界?', (
+        coordinate < 0 ||
+        coordinate % 100 > colCount ||
+        ~~(coordinate / 100) > rowCount
+      )
+    );
+  }),
   // stop on coordinate < 0
 );
 
@@ -69,14 +82,16 @@ function App() {
   const [isPause, setIsPause] = useState(true);
 
   const [gridSize, setGridSize] = useState({
-    colCount: 0,
-    rowCount: 0,
+    colCount,
+    rowCount,
   });
 
   const handleResize = () => {
+    colCount = ~~(appDOM.current.offsetWidth / boxLen);
+    rowCount = ~~((appDOM.current.offsetHeight - headerDOM.current.offsetHeight) / boxLen);
     setGridSize({
-      colCount: ~~(appDOM.current.offsetWidth / boxLen),
-      rowCount: ~~((appDOM.current.offsetHeight - headerDOM.current.offsetHeight) / boxLen),
+      colCount,
+      rowCount,
     });
   };
 
