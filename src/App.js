@@ -21,17 +21,6 @@ import Snake, { duration, boxLen } from 'components/Snake';
 
 import style from './App.module.scss';
 
-export const DIRECTION_MAP = {
-  RIGHT: 1,
-  LEFT: -1,
-  DOWN: 100,
-  UP: -100,
-  '1': 'RIGHT',
-  '-1': 'LEFT',
-  '100': 'DOWN',
-  '-100': 'UP',
-}
-
 const KEY_MAP = {
   '37': 'LEFT',
   '38': 'UP',
@@ -39,38 +28,49 @@ const KEY_MAP = {
   '40': 'DOWN',
 }
 
-const INIT_COORDINATE = 0;
+const INIT_POS = {x: 0, y: 0};
+const INIT_DIRECTION = 'RIGHT';
+let pos = {...INIT_POS};
+let direction = INIT_DIRECTION;
+
 let colCount = 0;
 let rowCount = 0;
-let coordinate = INIT_COORDINATE;
-let currDirection = DIRECTION_MAP.RIGHT;
 
 const time$ = timer(0, duration);
 
 const tickSnake$ = time$.pipe(
-  mapTo(coordinate),
-  scan((c) => {
-    return currDirection + (
-      c === INIT_COORDINATE && coordinate !== INIT_COORDINATE ?
-      coordinate: c
+  mapTo(JSON.stringify(pos)),
+  scan(p => {
+    const updatePos = (
+      JSON.stringify(INIT_POS) === (p) &&
+      JSON.stringify(INIT_POS) !== JSON.stringify(pos)?
+      {...pos}: JSON.parse(p)
     );
-  }, INIT_COORDINATE),
+
+    const D = ['LEFT', 'UP'].includes(direction) ? -1: 1;
+    const XY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
+    
+    updatePos[XY] = updatePos[XY] + D;
+    return JSON.stringify(updatePos);
+
+  }, JSON.stringify(INIT_POS)),
   distinctUntilChanged(),
   tap(value =>
-    coordinate = value
+    pos = JSON.parse(value)
   ),
-  tap(coordinate => {
-    console.log(
-      '位置', coordinate,
-      'colCount', colCount,
-      'rowCount', rowCount,
-      '是否越界?', (
-        coordinate < 0 ||
-        coordinate % 100 > colCount ||
-        ~~(coordinate / 100) > rowCount
-      )
-    );
-  }),
+  tap(console.log)
+  // tap(coordinate => {
+  //   console.log(
+  //     '位置', coordinate,
+  //     'colCount', colCount,
+  //     'rowCount', rowCount,
+  //     '是否越界?', (
+  //       coordinate < 0 ||
+  //       coordinate % 100 > colCount ||
+  //       ~~(coordinate / 100) > rowCount
+  //     )
+  //   );
+  // }),
   // stop on coordinate < 0
 );
 
@@ -97,7 +97,7 @@ function App() {
 
   const handleKeyDown = (e) => {
     if(KEY_MAP.hasOwnProperty(e.keyCode))
-      currDirection = DIRECTION_MAP[KEY_MAP[e.keyCode]];
+      direction = KEY_MAP[e.keyCode];
   }
 
   useEffect(() => {
@@ -117,8 +117,7 @@ function App() {
       tap(setIsPause),
       switchMap(isPause => isPause ? empty(): tickSnake$),
       // tap(console.log),
-    ),
-    INIT_COORDINATE,
+    )
   );
   
   return (
@@ -143,12 +142,10 @@ function App() {
             </div>
           )
         }
-        {coordinate !== null &&
-          <Snake {...{
-            coordinate,
-            direction: currDirection,
-          }} />
-        }
+        <Snake {...{
+          pos,
+          direction,
+        }} />
       </div>
     </div>
   );
