@@ -8,6 +8,7 @@ import {
   scan,
   mapTo,
   switchMap,
+  takeWhile,
   distinctUntilChanged,
 } from "rxjs/operators";
 
@@ -55,23 +56,12 @@ const tickSnake$ = time$.pipe(
 
   }, JSON.stringify(INIT_POS)),
   distinctUntilChanged(),
-  tap(value =>
-    pos = JSON.parse(value)
-  ),
-  tap(console.log)
-  // tap(coordinate => {
-  //   console.log(
-  //     '位置', coordinate,
-  //     'colCount', colCount,
-  //     'rowCount', rowCount,
-  //     '是否越界?', (
-  //       coordinate < 0 ||
-  //       coordinate % 100 > colCount ||
-  //       ~~(coordinate / 100) > rowCount
-  //     )
-  //   );
-  // }),
-  // stop on coordinate < 0
+  tap(value => pos = JSON.parse(value)),
+  takeWhile( value => {
+    const pos = JSON.parse(value);
+    return pos.x >= 0 && pos.y >= 0 &&
+          pos.x < colCount && pos.y < rowCount;
+  }),
 );
 
 function App() {
