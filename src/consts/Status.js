@@ -1,0 +1,13 @@
+export const SCREEN_STATES = {
+  MENU: 'MENU',
+  ABOUT: 'ABOUT',
+  SINGLE: 'SINGLE',
+  MULTIPLE: 'MULTIPLE',
+};
+
+export const GAME_STATES = {
+  READY: 'READY',
+  PAUSE: 'PAUSE',
+  PLAYING: 'PLAYING',
+  GAMEOVER: 'GAMEOVER',
+};
