@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function MultipleGamePage() {
+export function MultipleGamePage() {
   return (
     <div>
       MultipleGamePage
