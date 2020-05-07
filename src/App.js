@@ -27,7 +27,7 @@ const KEY_MAP = {
   '38': 'UP',
   '39': 'RIGHT',
   '40': 'DOWN',
-}
+};
 
 const INIT_POS = {x: 0, y: 0};
 const INIT_DIRECTION = 'RIGHT';
@@ -42,11 +42,11 @@ const time$ = timer(0, duration);
 const tickSnake$ = time$.pipe(
   mapTo(JSON.stringify(pos)),
   scan(p => {
-    const updatePos = (
-      JSON.stringify(INIT_POS) === (p) &&
+    const updatePos = 
+      JSON.stringify(INIT_POS) === p &&
       JSON.stringify(INIT_POS) !== JSON.stringify(pos)?
-      {...pos}: JSON.parse(p)
-    );
+        {...pos}: JSON.parse(p)
+    ;
 
     const D = ['LEFT', 'UP'].includes(direction) ? -1: 1;
     const XY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
@@ -88,7 +88,7 @@ function App() {
   const handleKeyDown = (e) => {
     if(KEY_MAP.hasOwnProperty(e.keyCode))
       direction = KEY_MAP[e.keyCode];
-  }
+  };
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
@@ -98,7 +98,7 @@ function App() {
     return () => {
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("keydown", handleKeyDown);
-    }
+    };
   }, []);
 
   const [handleTogglePause] = useEventCallback((event$) =>
@@ -120,17 +120,17 @@ function App() {
       </div>
       <div className={style.grid}>
         {
-          (!gridSize.colCount || !gridSize.rowCount) ? null:
-          [...Array(gridSize.rowCount).keys()].map(row =>
-            <div key={row} className={style.row}>
-              {[...Array(gridSize.colCount).keys()].map(col =>
-                <div key={col} style={{
-                  width: boxLen,
-                  height: boxLen,
-                }} className={style.box} />
-              )}
-            </div>
-          )
+          !gridSize.colCount || !gridSize.rowCount ? null:
+            [...Array(gridSize.rowCount).keys()].map(row =>
+              <div key={row} className={style.row}>
+                {[...Array(gridSize.colCount).keys()].map(col =>
+                  <div key={col} style={{
+                    width: boxLen,
+                    height: boxLen,
+                  }} className={style.box} />
+                )}
+              </div>
+            )
         }
         <Snake {...{
           pos,
