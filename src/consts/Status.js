@@ -1,11 +1,11 @@
-export const SCREEN_STATES = {
+export const SCREEN = {
   MENU: 'MENU',
   ABOUT: 'ABOUT',
   SINGLE: 'SINGLE',
   MULTIPLE: 'MULTIPLE',
 };
 
-export const GAME_STATES = {
+export const GAME = {
   READY: 'READY',
   PAUSE: 'PAUSE',
   PLAYING: 'PLAYING',
