@@ -1,5 +1,7 @@
 import * as NAV from './Nav';
+import * as GAME from './Game';
 
-export {
+export const ACTION = {
   NAV,
+  GAME,
 };

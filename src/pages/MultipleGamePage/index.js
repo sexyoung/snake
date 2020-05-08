@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { NAV } from 'consts';
+import { ACTION } from 'consts';
 
 export function MultipleGamePage({ send }) {
   return (
     <div>
-      MultipleGamePage
-      <button onClick={() => send(NAV.GO_MENU)}>menu</button>
+      <h3>MultipleGamePage</h3>
+      <button onClick={() => send(ACTION.NAV.GO_MENU)}>menu</button>
     </div>
   );
 }

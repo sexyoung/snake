@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { tap, scan, mapTo, switchMap, takeWhile, distinctUntilChanged } from "rxjs/operators";
 
 
-import { NAV } from 'consts';
+import { ACTION } from 'consts';
 import Snake, { duration, boxLen } from 'components/Snake';
 
 import style from './style.module.scss';
@@ -103,7 +103,7 @@ export function SingleGamePage({ send }) {
         <button onClick={handleTogglePause}>
           {isPause ? 'play': 'pause'}
         </button>
-        <button onClick={() => send(NAV.GO_MENU)}>menu</button>
+        <button onClick={() => send(ACTION.NAV.GO_MENU)}>menu</button>
       </div>
       <div className={style.grid}>
         {

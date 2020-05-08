@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { NAV } from 'consts';
+import { ACTION } from 'consts';
 
 export function AboutPage({ send }) {
   return (
     <div>
-      AboutPage
-      <button onClick={() => send(NAV.GO_MENU)}>menu</button>
+      <h3>AboutPage</h3>
+      <button onClick={() => send(ACTION.NAV.GO_MENU)}>menu</button>
     </div>
   );
 }
