@@ -2,8 +2,7 @@ import React from 'react';
 import { useMachine } from '@xstate/react';
 
 import { SCREEN } from 'consts';
-import { getMachine, useXState } from 'hooks';
-import { screenMachine } from  'stateNodes/Screen';
+import { appMachine } from  'stateNodes';
 
 import {
   MenuPage,
@@ -13,16 +12,14 @@ import {
 } from './pages';
 
 export default function App() {
-  const s = getMachine(screenMachine);
-  const ss = useXState(s);
-  // console.warn(s, state);
+  const [state, send] = useMachine(appMachine, { devTools: true });
   
   return (
     <>
-      {ss.state.matches(SCREEN.MENU) && <MenuPage />}
-      {ss.state.matches(SCREEN.ABOUT) && <AboutPage />}
-      {ss.state.matches(SCREEN.SINGLE) && <SingleGamePage />}
-      {ss.state.matches(SCREEN.MULTIPLE) && <MultipleGamePage />}
+      {state.matches(SCREEN.MENU) && <MenuPage {...{ send }} />}
+      {state.matches(SCREEN.ABOUT) && <AboutPage {...{ send }} />}
+      {state.matches(SCREEN.SINGLE) && <SingleGamePage {...{ send }} />}
+      {state.matches(SCREEN.MULTIPLE) && <MultipleGamePage {...{ send }} />}
     </>
   );
 }

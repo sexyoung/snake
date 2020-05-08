@@ -3,6 +3,8 @@ import { useEventCallback } from "rxjs-hooks";
 import React, { useState, useEffect, useRef } from 'react';
 import { tap, scan, mapTo, switchMap, takeWhile, distinctUntilChanged } from "rxjs/operators";
 
+
+import { NAV } from 'consts';
 import Snake, { duration, boxLen } from 'components/Snake';
 
 import style from './style.module.scss';
@@ -48,7 +50,7 @@ const tickSnake$ = time$.pipe(
   }),
 );
 
-export function SingleGamePage() {
+export function SingleGamePage({ send }) {
 
   const headerDOM = useRef();
   const singleGamePageDOM = useRef();
@@ -101,6 +103,7 @@ export function SingleGamePage() {
         <button onClick={handleTogglePause}>
           {isPause ? 'play': 'pause'}
         </button>
+        <button onClick={() => send(NAV.GO_MENU)}>menu</button>
       </div>
       <div className={style.grid}>
         {

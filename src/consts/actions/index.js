@@ -1,1 +1,5 @@
-export * from './Screen';
+import * as NAV from './Nav';
+
+export {
+  NAV,
+};
