@@ -3,9 +3,11 @@ import {
   STATUS,
 } from 'consts';
 
+import SINGLE_STATE_NODE from './singleStateNode';
+
 export default {
   id: 'navMachine',
-  initial: STATUS.SCREEN.MENU,
+  initial: STATUS.SCREEN.SINGLE,
   states: {
     [STATUS.SCREEN.MENU]: {
       on: {
@@ -19,11 +21,7 @@ export default {
         [ACTION.NAV.GO_MENU]: STATUS.SCREEN.MENU,
       }
     },
-    [STATUS.SCREEN.SINGLE]: {
-      on: {
-        [ACTION.NAV.GO_MENU]: STATUS.SCREEN.MENU,
-      }
-    },
+    [STATUS.SCREEN.SINGLE]: SINGLE_STATE_NODE,
     [STATUS.SCREEN.MULTIPLE]: {
       on: {
         [ACTION.NAV.GO_MENU]: STATUS.SCREEN.MENU,

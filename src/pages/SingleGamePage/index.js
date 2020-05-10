@@ -50,7 +50,7 @@ const tickSnake$ = time$.pipe(
   }),
 );
 
-export function SingleGamePage({ send }) {
+export function SingleGamePage({ state, send }) {
 
   const headerDOM = useRef();
   const singleGamePageDOM = useRef();
