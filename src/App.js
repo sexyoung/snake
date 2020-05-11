@@ -11,14 +11,11 @@ import {
   MultipleGamePage,
 } from './pages';
 
-import { matchPath } from 'utils';
+import { isRoute } from 'utils';
 
 export default function App() {
   const [state, send] = useMachine(appMachine, { devTools: true });
-
-  console.log(matchPath(state.value, STATUS.GAME.READY));
-  
-
+  state.at = route => isRoute(state.value, route);  
   return (
     <>
       {state.matches(STATUS.SCREEN.MENU) && <MenuPage {...{ send }} />}

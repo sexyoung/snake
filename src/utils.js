@@ -1,3 +1,4 @@
+/** A.B.C... => `A.B.C...` */
 export const matchPath = (obj, target) => {
   for (const key in obj) {
     if(key === target) return key;
@@ -10,4 +11,9 @@ export const matchPath = (obj, target) => {
     }
   }
   return null;
+};
+
+export const isRoute = (obj, target) => {
+  if(!matchPath(obj, target)) return false;
+  return true;
 };
