@@ -15,7 +15,8 @@ import { isRoute } from 'utils';
 
 export default function App() {
   const [state, send] = useMachine(appMachine, { devTools: true });
-  state.at = route => isRoute(state.value, route);  
+  state.at = route => isRoute(state.value, route);
+  console.log(state.at(STATUS.GAME.GAMEOVER));
   return (
     <>
       {state.matches(STATUS.SCREEN.MENU) && <MenuPage {...{ send }} />}
