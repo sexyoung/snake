@@ -28,7 +28,7 @@ const KEY_MAP = {
 
 const INIT_POS = {x: 0, y: 0};
 const INIT_DIRECTION = 'RIGHT';
-const INIT_IS_PAUSE = true;
+// const INIT_IS_PAUSE = true;
 let pos = {...INIT_POS};
 let direction = INIT_DIRECTION;
 
@@ -40,7 +40,7 @@ const isRange = ({ pos, colCount, rowCount }) => {
   pos.x < colCount && pos.y < rowCount;
 };
 
-const keydown$ = fromEvent(document, 'keydown');
+// const keydown$ = fromEvent(document, 'keydown');
 
 // const tickSnake$ = timer(0, duration).pipe(
 //   scan(p => {
@@ -98,58 +98,62 @@ export function SingleGamePage({ state, send }) {
     };
   }, []);
 
-  const [handleTogglePause] = useEventCallback((event$) =>
-    merge(event$, keydown$).pipe(
-      scan((curIsPause, e) => {
-        if(e.type === 'click') return !curIsPause;
-        if(e.type === 'keydown') {
-          if(KEY_MAP.hasOwnProperty(e.keyCode)) {
-            direction = KEY_MAP[e.keyCode];
-            return false;
-          }
-        }
-        return curIsPause;
-      }, INIT_IS_PAUSE),
-      tap(setIsPause),
-      switchMap(curIsPause => curIsPause ? empty(): timer(0, duration).pipe(
-        scan(p => {
-          const updatePos = 
-            JSON.stringify(INIT_POS) === p &&
-            JSON.stringify(INIT_POS) !== JSON.stringify(pos)?
-              {...pos}: JSON.parse(p)
-          ;
+  // const [handleTogglePause] = useEventCallback((event$) =>
+  //   merge(event$, keydown$).pipe(
+  //     scan((curIsPause, e) => {
+  //       if(e.type === 'click') return !curIsPause;
+  //       if(e.type === 'keydown') {
+  //         if(KEY_MAP.hasOwnProperty(e.keyCode)) {
+  //           direction = KEY_MAP[e.keyCode];
+  //           return false;
+  //         }
+  //       }
+  //       return curIsPause;
+  //     }, INIT_IS_PAUSE),
+  //     tap(setIsPause),
+  //     switchMap(curIsPause => curIsPause ? empty(): timer(0, duration).pipe(
+  //       scan(p => {
+  //         const updatePos = 
+  //           JSON.stringify(INIT_POS) === p &&
+  //           JSON.stringify(INIT_POS) !== JSON.stringify(pos)?
+  //             {...pos}: JSON.parse(p)
+  //         ;
       
-          const D = ['LEFT', 'UP'].includes(direction) ? -1: 1;
-          const XY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
+  //         const D = ['LEFT', 'UP'].includes(direction) ? -1: 1;
+  //         const XY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
           
-          updatePos[XY] = updatePos[XY] + D;
-          return JSON.stringify(updatePos);
+  //         updatePos[XY] = updatePos[XY] + D;
+  //         return JSON.stringify(updatePos);
       
-        }, JSON.stringify(INIT_POS)),
-        distinctUntilChanged(),
-        map(p => JSON.parse(p)),
-        takeWhile(value => {
-          pos = value;
-          const inRange = isRange({ pos, colCount, rowCount});
-          if(!inRange) {
-            // setIsPause(true);
-            console.log(STATUS.GAME.GAMEOVER);
-            send(STATUS.GAME.GAMEOVER);
-          }
-          return inRange;
-        }),
-      )),
-    )
-  );
+  //       }, JSON.stringify(INIT_POS)),
+  //       distinctUntilChanged(),
+  //       map(p => JSON.parse(p)),
+  //       takeWhile(value => {
+  //         pos = value;
+  //         const inRange = isRange({ pos, colCount, rowCount});
+  //         if(!inRange) {
+  //           // setIsPause(true);
+  //           console.log(STATUS.GAME.GAMEOVER);
+  //           send(STATUS.GAME.GAMEOVER);
+  //         }
+  //         return inRange;
+  //       }),
+  //     )),
+  //   )
+  // );
 
   console.log('isPause', isPause);
-  
+
+  const handleTogglePause2 = () => {
+    if(state.at(STATUS.GAME.READY)) send(ACTION.GAME.PLAY);
+    setIsPause(isPause => !isPause);
+  };
 
   return (
     <div className={style.SingleGamePage} ref={singleGamePageDOM}>
       <div className={style.header} ref={headerDOM}>
         0
-        <button onClick={handleTogglePause}>
+        <button onClick={handleTogglePause2}>
           {isPause ? 'play': 'pause'}
         </button>
         <button onClick={() => send(ACTION.NAV.GO_MENU)}>menu</button>
