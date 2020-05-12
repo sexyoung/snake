@@ -1,10 +1,19 @@
-import { empty, timer } from "rxjs";
+import { empty, timer, fromEvent, merge, combineLatest } from "rxjs";
 import { useEventCallback } from "rxjs-hooks";
 import React, { useState, useEffect, useRef } from 'react';
-import { tap, scan, mapTo, switchMap, takeWhile, distinctUntilChanged } from "rxjs/operators";
+import {
+  tap,
+  scan,
+  mapTo,
+  pluck,
+  filter,
+  switchMap,
+  takeWhile,
+  distinctUntilChanged,
+} from "rxjs/operators";
 
 
-import { ACTION } from 'consts';
+import { ACTION, STATUS } from 'consts';
 import Snake, { duration, boxLen } from 'components/Snake';
 
 import style from './style.module.scss';
@@ -17,15 +26,16 @@ const KEY_MAP = {
 
 const INIT_POS = {x: 0, y: 0};
 const INIT_DIRECTION = 'RIGHT';
+const INIT_IS_PAUSE = true;
 let pos = {...INIT_POS};
 let direction = INIT_DIRECTION;
 
 let colCount = 0;
 let rowCount = 0;
 
-const time$ = timer(0, duration);
+const keydown$ = fromEvent(document, 'keydown');
 
-const tickSnake$ = time$.pipe(
+const tickSnake$ = timer(0, duration).pipe(
   mapTo(JSON.stringify(pos)),
   scan(p => {
     const updatePos = 
@@ -55,8 +65,8 @@ export function SingleGamePage({ state, send }) {
   const headerDOM = useRef();
   const singleGamePageDOM = useRef();
 
-  const [isPause, setIsPause] = useState(true);
-
+  /** 只要不是 playing 應該就是暫停吧 */
+  const [isPause, setIsPause] = useState(!state.at(STATUS.GAME.PLAYING));
   const [gridSize, setGridSize] = useState({
     colCount,
     rowCount,
@@ -71,30 +81,35 @@ export function SingleGamePage({ state, send }) {
     });
   };
 
-  const handleKeyDown = (e) => {
-    if(KEY_MAP.hasOwnProperty(e.keyCode))
-      direction = KEY_MAP[e.keyCode];
-  };
 
   useEffect(() => {
     window.addEventListener('resize', handleResize);
-    document.addEventListener("keydown", handleKeyDown);
 
     handleResize();
     return () => {
       window.removeEventListener("resize", handleResize);
-      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
-  const [handleTogglePause] = useEventCallback((event$) =>
-    event$.pipe(
-      scan(isPause => !isPause, isPause),
+  const [handleTogglePause, r] = useEventCallback((event$) =>
+    merge(event$, keydown$).pipe(
+      scan((curIsPause, e) => {
+        if(e.type === 'click') return !curIsPause;
+        if(e.type === 'keydown') {
+          if(KEY_MAP.hasOwnProperty(e.keyCode)) {
+            direction = KEY_MAP[e.keyCode];
+            return false;
+          }
+        }
+        return curIsPause;
+      }, INIT_IS_PAUSE),
       tap(setIsPause),
-      switchMap(isPause => isPause ? empty(): tickSnake$),
-      // tap(console.log),
+      switchMap(curIsPause => curIsPause ? empty(): tickSnake$),
     )
   );
+
+  console.log('isPause', isPause, r);
+  
 
   return (
     <div className={style.SingleGamePage} ref={singleGamePageDOM}>
