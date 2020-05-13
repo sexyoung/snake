@@ -18,7 +18,7 @@ const KEY_MAP = {
 let moveInterval = null;
 let direction = '';
 
-export default ({colCount = 0, rowCount = 0, setIsPause }) => {
+export default ({colCount = 0, rowCount = 0 }) => {
   return function Snake({ state, send }) {
 
     const GAME_STATUS = state.str(true);
@@ -47,9 +47,15 @@ export default ({colCount = 0, rowCount = 0, setIsPause }) => {
         if(curXY !== nextXY)
           direction = KEY_MAP[e.keyCode];
         
-        if(state.at(STATUS.GAME.READY)) {
-          setIsPause(false);
+        send(ACTION.GAME.PLAY);
+
+      } else if(e.keyCode === 32) {
+        if(state.at(STATUS.GAME.PLAYING)) {
+          send(ACTION.GAME.PAUSE);
+        } else if (state.at(STATUS.GAME.PAUSE)) {
           send(ACTION.GAME.PLAY);
+        } else if (state.at(STATUS.GAME.GAMEOVER)) {
+          send(STATUS.GAME.READY);
         }
       }
     };
@@ -62,13 +68,13 @@ export default ({colCount = 0, rowCount = 0, setIsPause }) => {
     }, [state.value]);
 
     useEffect(() => {
-      if(GAME_STATUS === STATUS.GAME.READY) {
+      if(state.at(STATUS.GAME.READY)) {
         
         direction = '';
         setPos.x(~~(Math.random() * colCount));
         setPos.y(~~(Math.random() * rowCount));
       }
-      else if(GAME_STATUS === STATUS.GAME.PLAYING) {
+      else if(state.at(STATUS.GAME.PLAYING)) {
         move();
         moveInterval = setInterval(move, duration);
       } else if (state.inMeta('SNAKE_STOP')) {

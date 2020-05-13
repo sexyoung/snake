@@ -13,7 +13,6 @@ export function SingleGamePage({ state, send }) {
   const singleGamePageDOM = useRef();
 
   /** 只要不是 playing 應該就是暫停吧 */
-  const [isPause, setIsPause] = useState(!state.at(STATUS.GAME.PLAYING));
   const [gridSize, setGridSize] = useState({
     colCount: 0,
     rowCount: 0,
@@ -27,11 +26,7 @@ export function SingleGamePage({ state, send }) {
       rowCount,
     });
 
-    Snake = createSnake({ colCount, rowCount, setIsPause });
-  };
-
-  const handleRestart = () => {
-    send(STATUS.GAME.READY);
+    Snake = createSnake({ colCount, rowCount });
   };
 
   useEffect(() => {
@@ -43,26 +38,12 @@ export function SingleGamePage({ state, send }) {
     };
   }, []);
 
-  const togglePause = () => {
-    if(state.at(STATUS.GAME.READY)) send(ACTION.GAME.PLAY);
-    else if(state.at(STATUS.GAME.PAUSE)) send(ACTION.GAME.PLAY);
-    else if(state.at(STATUS.GAME.PLAYING)) send(ACTION.GAME.PAUSE);
-    setIsPause(isPause => !isPause);
-  };
-
   return (
     <div className={style.SingleGamePage} ref={singleGamePageDOM}>
       <div className={style.header} ref={headerDOM}>
         0
-        {state.inMeta('IN_GAME') &&
-          <button onClick={togglePause}>
-            {isPause ? 'resume': 'pause'}
-          </button>
-        }
         {state.at(STATUS.GAME.GAMEOVER) &&
-          <button onClick={handleRestart}>
-            restart
-          </button>
+          "GAMEOVER"
         }
         <button onClick={() => send(ACTION.NAV.GO_MENU)}>menu</button>
       </div>
