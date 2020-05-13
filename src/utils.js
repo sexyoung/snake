@@ -17,3 +17,11 @@ export const isRoute = (obj, target) => {
   if(!matchPath(obj, target)) return false;
   return true;
 };
+
+export const toStr = (obj, abs = false) => {
+  for (const key in obj) {
+    return (abs ? '': `${key}.`) + (obj[key] instanceof Object ?
+      toStr(obj[key]): obj[key]
+    );
+  }
+};

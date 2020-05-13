@@ -19,19 +19,31 @@ export default {
     },
     [STATUS.GAME.PLAYING]: {
       on: {
-        // [ACTION.NAV.GO_MENU]: MENU,
+        [ACTION.GAME.PAUSE]: STATUS.GAME.PAUSE,
+        [ACTION.GAME.OVER]: STATUS.GAME.GAMEOVER,
+      },
+      meta: {
+        message: 'IN_GAME'
       }
     },
     [STATUS.GAME.PAUSE]: {
       on: {
         [ACTION.NAV.GO_MENU]: MENU,
+        [ACTION.GAME.PLAY]: STATUS.GAME.PLAYING,
+      },
+      meta: {
+        message: 'IN_GAME',
+        snakeMoving: 'SNAKE_STOP',
       }
     },
     [STATUS.GAME.GAMEOVER]: {
       on: {
-        [ACTION.NAV.GO_MENU]: STATUS.GAME.READY,
+        [ACTION.GAME.READY]: STATUS.GAME.READY,
         [ACTION.NAV.GO_MENU]: MENU,
-      }
+      },
+      meta: {
+        snakeMoving: 'SNAKE_STOP',
+      },
     },
   }
 };
