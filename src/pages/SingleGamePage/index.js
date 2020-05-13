@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { ACTION, STATUS } from 'consts';
-import Snake, { duration, boxLen } from 'components/Snake';
+import createSnake, { duration, boxLen } from 'components/Snake';
 
 import style from './style.module.scss';
 const KEY_MAP = {
@@ -13,10 +13,8 @@ const KEY_MAP = {
 
 const INIT_DIRECTION = 'RIGHT';
 let moveInterval = null;
+let Snake = null;
 let direction = INIT_DIRECTION;
-
-let colCount = 0;
-let rowCount = 0;
 
 export function SingleGamePage({ state, send }) {
 
@@ -32,8 +30,8 @@ export function SingleGamePage({ state, send }) {
   /** 只要不是 playing 應該就是暫停吧 */
   const [isPause, setIsPause] = useState(!state.at(STATUS.GAME.PLAYING));
   const [gridSize, setGridSize] = useState({
-    colCount,
-    rowCount,
+    colCount: 0,
+    rowCount: 0,
   });
 
   const handleKeydown = (e) => {
@@ -54,12 +52,14 @@ export function SingleGamePage({ state, send }) {
   };
 
   const handleResize = () => {
-    colCount = ~~(singleGamePageDOM.current.offsetWidth / boxLen);
-    rowCount = ~~((singleGamePageDOM.current.offsetHeight - headerDOM.current.offsetHeight) / boxLen);
+    const colCount = ~~(singleGamePageDOM.current.offsetWidth / boxLen);
+    const rowCount = ~~((singleGamePageDOM.current.offsetHeight - headerDOM.current.offsetHeight) / boxLen);
     setGridSize({
       colCount,
       rowCount,
     });
+
+    Snake = createSnake(colCount, rowCount);
   };
 
   const handleRestart = () => {
@@ -138,10 +138,10 @@ export function SingleGamePage({ state, send }) {
               </div>
             )
         }
-        <Snake {...{
+        {Snake && <Snake {...{
           pos: {x, y},
           direction,
-        }} />
+        }} />}
       </div>
     </div>
   );

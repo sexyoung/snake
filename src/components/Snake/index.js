@@ -6,16 +6,28 @@ import style from './style.module.scss';
 export const boxLen = +style.boxLen;
 export const duration = +style.duration;
 
-export default function Snake({ direction, pos }) {
+const KEY_MAP = {
+  '37': 'LEFT',
+  '38': 'UP',
+  '39': 'RIGHT',
+  '40': 'DOWN',
+};
 
-  const left = pos.x * boxLen;
-  const top = pos.y * boxLen;
+let moveInterval = null;
+let direction = 'RIGHT';
 
-  return (
-    <div className={style.SnakeWrapper} style={{
-      left, top
-    }}>
-      <div className={cx(style.Snake, style[direction])}></div>
-    </div>
-  );
-}
+export default (colCount = 0, rowCount = 0) => {
+  return function Snake({ direction, pos }) {
+
+    const left = pos.x * boxLen;
+    const top = pos.y * boxLen;
+  
+    return (
+      <div className={style.SnakeWrapper} style={{
+        left, top
+      }}>
+        <div className={cx(style.Snake, style[direction])}></div>
+      </div>
+    );
+  };
+};
