@@ -19,8 +19,7 @@ export default function App() {
   state.str = (abs = false) => toStr(state.value, abs);
   state.inMeta = message => isRoute(state.meta, message);
   
-  console.log(state.value);
-  
+  // console.log(state.value);
 
   return (
     <>

@@ -1,31 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { ACTION, STATUS } from 'consts';
-import createSnake, { duration, boxLen } from 'components/Snake';
+import createSnake, { boxLen } from 'components/Snake';
 
 import style from './style.module.scss';
-const KEY_MAP = {
-  '37': 'LEFT',
-  '38': 'UP',
-  '39': 'RIGHT',
-  '40': 'DOWN',
-};
 
-const INIT_DIRECTION = 'RIGHT';
-let moveInterval = null;
 let Snake = null;
-let direction = INIT_DIRECTION;
 
 export function SingleGamePage({ state, send }) {
 
-  const GAME_STATUS = state.str(true);
-
   const headerDOM = useRef();
   const singleGamePageDOM = useRef();
-
-  const [ x, setX ] = useState(0);
-  const [ y, setY ] = useState(0);
-  const setPos = {x: setX, y: setY};
 
   /** 只要不是 playing 應該就是暫停吧 */
   const [isPause, setIsPause] = useState(!state.at(STATUS.GAME.PLAYING));
@@ -33,23 +18,6 @@ export function SingleGamePage({ state, send }) {
     colCount: 0,
     rowCount: 0,
   });
-
-  const handleKeydown = (e) => {
-    if(KEY_MAP.hasOwnProperty(e.keyCode)) {
-
-      const curXY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
-      const nextXY = ['LEFT', 'RIGHT'].includes(KEY_MAP[e.keyCode]) ? 'x': 'y';
-
-      /** 只能左/右 90度轉彎 */
-      if(curXY !== nextXY)
-        direction = KEY_MAP[e.keyCode];
-
-      if(state.at(STATUS.GAME.READY)) {
-        setIsPause(false);
-        send(ACTION.GAME.PLAY);
-      }
-    }
-  };
 
   const handleResize = () => {
     const colCount = ~~(singleGamePageDOM.current.offsetWidth / boxLen);
@@ -59,47 +27,21 @@ export function SingleGamePage({ state, send }) {
       rowCount,
     });
 
-    Snake = createSnake(colCount, rowCount);
+    Snake = createSnake({ colCount, rowCount, setIsPause });
   };
 
   const handleRestart = () => {
     send(STATUS.GAME.READY);
   };
 
-  const move = () => {
-    const D = ['LEFT', 'UP'].includes(direction) ? -1: 1;
-    const XY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
-    setPos[XY](value => value + D);
-  };
-
   useEffect(() => {
     window.addEventListener('resize', handleResize);
-    window.addEventListener('keydown', handleKeydown);
 
     handleResize();
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("keydown", handleKeydown);
     };
   }, []);
-    
-  useEffect(() => {
-    if(GAME_STATUS === STATUS.GAME.PLAYING) {
-      move();
-      moveInterval = setInterval(move, duration);
-    } else if (state.inMeta('SNAKE_STOP')) {
-      clearInterval(moveInterval);
-    }
-  }, [GAME_STATUS]);
-
-  useEffect(() => {
-    if(x < 0 || y < 0) {
-      const D = ['LEFT', 'UP'].includes(direction) ? -1: 1;
-      const XY = ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y';
-      setPos[XY](value => value - D);
-      send(ACTION.GAME.OVER);
-    }
-  }, [x, y]);
 
   const togglePause = () => {
     if(state.at(STATUS.GAME.READY)) send(ACTION.GAME.PLAY);
@@ -139,8 +81,8 @@ export function SingleGamePage({ state, send }) {
             )
         }
         {Snake && <Snake {...{
-          pos: {x, y},
-          direction,
+          send,
+          state,
         }} />}
       </div>
     </div>
