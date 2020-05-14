@@ -1,6 +1,6 @@
 $boxLen: 50;
 $duration: 150;
-$snakeLen: $boxLen * .8;
+$snakeLen: $boxLen;
 
 @keyframes opacity {
   from {opacity: 0;}
@@ -30,10 +30,10 @@ $snakeLen: $boxLen * .8;
     position: absolute;
     background-color: #7a5151;
     transform: translate(-50%, -50%);
-    &.UP { top: 0%; transform: translate(-50%, 0%); }
-    &.DOWN { top: 100%; transform: translate(-50%, -100%); }
-    &.LEFT { left: 0%; transform: translate(0%, -50%); }
-    &.RIGHT { left: 100%; transform: translate(-100%, -50%); }
+    // &.UP { top: 0%; transform: translate(-50%, 0%); }
+    // &.DOWN { top: 100%; transform: translate(-50%, -100%); }
+    // &.LEFT { left: 0%; transform: translate(0%, -50%); }
+    // &.RIGHT { left: 100%; transform: translate(-100%, -50%); }
     transition: left #{$duration}ms linear, top #{$duration}ms linear, transform #{$duration}ms linear;
   }
 }
