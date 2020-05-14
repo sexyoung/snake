@@ -1,5 +1,5 @@
 $boxLen: 50;
-$duration: 150;
+$duration: 200;
 $snakeLen: $boxLen;
 
 @keyframes opacity {
@@ -13,8 +13,8 @@ $snakeLen: $boxLen;
 }
 
 .SnakeWrapper {
-  width: 50px;
-  height: 50px;
+  width: #{$boxLen}px;
+  height: #{$boxLen}px;
   position: absolute;
   transition: left #{$duration}ms linear, top #{$duration}ms linear;
   &.READY {
@@ -22,7 +22,7 @@ $snakeLen: $boxLen;
     animation-name: opacity;
     animation-duration: .3s;
   }
-  .Snake {
+  .head {
     top: 50%;
     left: 50%;
     width: #{$snakeLen}px;
@@ -35,5 +35,11 @@ $snakeLen: $boxLen;
     // &.LEFT { left: 0%; transform: translate(0%, -50%); }
     // &.RIGHT { left: 100%; transform: translate(-100%, -50%); }
     transition: left #{$duration}ms linear, top #{$duration}ms linear, transform #{$duration}ms linear;
+  }
+  .body {
+    position: absolute;
+    width: #{$snakeLen}px;
+    height: #{$snakeLen}px;
+    background-color: #7a5151;
   }
 }

@@ -21,22 +21,25 @@ let moveInterval = null;
 const getD = direction => direction ? ['LEFT', 'UP'].includes(direction) ? -1: 1: 0;
 const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y': '';
 
+/** [{x, y, direction}] */
+const bodyArr = [
+  {x: 2, y: 3, direction: 'RIGHT'}
+];
+
 export default ({colCount = 0, rowCount = 0}) => {
   return function Snake({ state, send }) {
 
     const GAME_STATUS = state.str(true);
 
-    const [ x, setX ] = useState(0);
-    const [ y, setY ] = useState(0);
-    const setPos = {x: setX, y: setY};
-
-    const left = x * boxLen;
-    const top = y * boxLen;
+    const [ headX, setHeadX ] = useState(0);
+    const [ headY, setHeadY ] = useState(0);
+    const setHeadPos = {x: setHeadX, y: setHeadY};
 
     const move = () => {
       const D = getD(direction);
       const XY = getXY(direction);
-      setPos[XY](value => value + D);
+      setHeadPos[XY](value => value + D);
+      bodyArr[0][XY] += D;
     };
 
     const handleKeydown = (e) => {
@@ -69,8 +72,10 @@ export default ({colCount = 0, rowCount = 0}) => {
     useEffect(() => {
       if(state.at(STATUS.GAME.READY)) {
         direction = '';
-        setPos.x(~~(Math.random() * colCount));
-        setPos.y(~~(Math.random() * rowCount));
+        setHeadPos.x(3);
+        setHeadPos.y(3);
+        // setHeadPos.x(~~(Math.random() * colCount));
+        // setHeadPos.y(~~(Math.random() * rowCount));
       }
       else if(state.at(STATUS.GAME.PLAYING)) {
         move();
@@ -80,22 +85,35 @@ export default ({colCount = 0, rowCount = 0}) => {
       }
     }, [GAME_STATUS]);
 
-    // 判斷邊界
+    // 判斷邊界, 還要判斷是否碰到蛇身體
     useEffect(() => {
-      if(x < 0 || y < 0 || x >= colCount || y >= rowCount) {
+      if(headX < 0 || headY < 0 || headX >= colCount || headY >= rowCount) {
         const D = getD(direction);
         const XY = getXY(direction);
-        setPos[XY](value => value - D);
+        setHeadPos[XY](value => value - D);
         send(ACTION.GAME.OVER);
       }
-    }, [x, y]);
+    }, [headX, headY]);
+
+    const top = headY * boxLen;
+    const left = headX * boxLen;
   
     return (
       <div
         style={{ left, top }}
         className={cx(style.SnakeWrapper, style[GAME_STATUS])}
       >
-        <div className={cx(style.Snake, style[direction])} />
+        <div className={cx(style.head, style[direction])} />
+        {bodyArr.map((part, i) =>
+          <div
+            key={i}
+            className={style.body}
+            style={{
+              top:  (part.y - headY) * boxLen,
+              left: (part.x - headX) * boxLen,
+            }}
+          />
+        )}
       </div>
     );
   };

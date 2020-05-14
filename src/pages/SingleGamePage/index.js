@@ -42,6 +42,7 @@ export function SingleGamePage({ state, send }) {
     <div className={style.SingleGamePage} ref={singleGamePageDOM}>
       <div className={style.header} ref={headerDOM}>
         0
+        {state.at(STATUS.GAME.PAUSE) && "PAUSE"}
         {state.at(STATUS.GAME.GAMEOVER) && "GAMEOVER"}
         <button onClick={() => send(ACTION.NAV.GO_MENU)}>menu</button>
       </div>
