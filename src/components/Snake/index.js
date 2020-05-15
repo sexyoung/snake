@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { STATUS, ACTION } from 'consts';
 
@@ -15,31 +15,41 @@ const KEY_MAP = {
   '40': 'DOWN',
 };
 
-let direction = '';
+let direction = 'RIGHT';
 let moveInterval = null;
 
 const getD = direction => direction ? ['LEFT', 'UP'].includes(direction) ? -1: 1: 0;
 const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y': '';
 
 /** [{x, y, direction}] */
-const bodyArr = [
-  {x: 2, y: 3, direction: 'RIGHT'}
-];
+let bodyArr = [];
+
+const resetBody = () => {
+  direction = 'RIGHT';
+  bodyArr = [
+    {x: 2, y: 3, direction: 'RIGHT'}
+  ];
+};
 
 export default ({colCount = 0, rowCount = 0}) => {
   return function Snake({ state, send }) {
 
     const GAME_STATUS = state.str(true);
 
-    const [ headX, setHeadX ] = useState(0);
-    const [ headY, setHeadY ] = useState(0);
-    const setHeadPos = {x: setHeadX, y: setHeadY};
+    // const [ headX, setHeadX ] = useState(3);
+    // const [ headY, setHeadY ] = useState(3);
+    // const setHeadPos = {x: setHeadX, y: setHeadY};
+    const [ headPos, setHeadPos ] = useState({x: 3, y: 3});
 
     const move = () => {
       const D = getD(direction);
       const XY = getXY(direction);
-      setHeadPos[XY](value => value + D);
-      bodyArr[0][XY] += D;
+      
+      setHeadPos(headPos => {
+        bodyArr[0] = { ...headPos, direction };
+        headPos[XY] += D;
+        return {...headPos};
+      });
     };
 
     const handleKeydown = (e) => {
@@ -61,6 +71,10 @@ export default ({colCount = 0, rowCount = 0}) => {
         else if (state.at(STATUS.GAME.GAMEOVER)) send(STATUS.GAME.READY);
       }
     };
+
+    useEffect(() => {
+      resetBody();
+    }, []);
     
     useEffect(() => {
       window.addEventListener('keydown', handleKeydown);
@@ -71,11 +85,8 @@ export default ({colCount = 0, rowCount = 0}) => {
 
     useEffect(() => {
       if(state.at(STATUS.GAME.READY)) {
-        direction = '';
-        setHeadPos.x(3);
-        setHeadPos.y(3);
-        // setHeadPos.x(~~(Math.random() * colCount));
-        // setHeadPos.y(~~(Math.random() * rowCount));
+        setHeadPos({x: 3, y: 3});
+        resetBody();
       }
       else if(state.at(STATUS.GAME.PLAYING)) {
         move();
@@ -87,17 +98,24 @@ export default ({colCount = 0, rowCount = 0}) => {
 
     // 判斷邊界, 還要判斷是否碰到蛇身體
     useEffect(() => {
-      if(headX < 0 || headY < 0 || headX >= colCount || headY >= rowCount) {
+      if(headPos.x < 0 || headPos.y < 0 || headPos.x >= colCount || headPos.y >= rowCount) {
         const D = getD(direction);
         const XY = getXY(direction);
-        setHeadPos[XY](value => value - D);
+        // setHeadPos[XY](value => value - D);
+        setHeadPos(headPos => {
+          headPos[XY] -= D;
+          return headPos;
+        });
         send(ACTION.GAME.OVER);
       }
-    }, [headX, headY]);
+    }, [headPos.x, headPos.y]);
 
-    const top = headY * boxLen;
-    const left = headX * boxLen;
-  
+    const top = headPos.y * boxLen;
+    const left = headPos.x * boxLen;
+
+    if(bodyArr.length)
+      console.log(`(${headPos.x},${headPos.y})<-(${bodyArr[0].x},${bodyArr[0].y})`);  
+
     return (
       <div
         style={{ left, top }}
@@ -109,8 +127,8 @@ export default ({colCount = 0, rowCount = 0}) => {
             key={i}
             className={style.body}
             style={{
-              top:  (part.y - headY) * boxLen,
-              left: (part.x - headX) * boxLen,
+              top:  (part.y - headPos.y) * boxLen,
+              left: (part.x - headPos.x) * boxLen,
             }}
           />
         )}

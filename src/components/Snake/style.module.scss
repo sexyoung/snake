@@ -1,5 +1,5 @@
 $boxLen: 50;
-$duration: 200;
+$duration: 500;
 $snakeLen: $boxLen;
 
 @keyframes opacity {
@@ -23,13 +23,19 @@ $snakeLen: $boxLen;
     animation-duration: .3s;
   }
   .head {
-    top: 50%;
-    left: 50%;
+    // top: 50%;
+    // left: 50%;
     width: #{$snakeLen}px;
     height: #{$snakeLen}px;
     position: absolute;
     background-color: #7a5151;
-    transform: translate(-50%, -50%);
+    // transform: translate(-50%, -50%);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    &.RIGHT { transform: rotate(90deg); }
+    &.UP { transform: rotate(0deg); }
+    &.LEFT { transform: rotate(-90deg); }
+    &.DOWN { transform: rotate(180deg); }
     // &.UP { top: 0%; transform: translate(-50%, 0%); }
     // &.DOWN { top: 100%; transform: translate(-50%, -100%); }
     // &.LEFT { left: 0%; transform: translate(0%, -50%); }
@@ -41,5 +47,6 @@ $snakeLen: $boxLen;
     width: #{$snakeLen}px;
     height: #{$snakeLen}px;
     background-color: #7a5151;
+    transition: left #{$duration}ms linear, top #{$duration}ms linear;
   }
 }
