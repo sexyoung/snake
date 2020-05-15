@@ -23,6 +23,8 @@ const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? '
 
 /** [{x, y, direction}] */
 let bodyArr = [];
+let isd270to360 = false;
+let isd360to270 = false;
 
 const resetBody = () => {
   direction = 'RIGHT';
@@ -35,10 +37,6 @@ export default ({colCount = 0, rowCount = 0}) => {
   return function Snake({ state, send }) {
 
     const GAME_STATUS = state.str(true);
-
-    // const [ headX, setHeadX ] = useState(3);
-    // const [ headY, setHeadY ] = useState(3);
-    // const setHeadPos = {x: setHeadX, y: setHeadY};
     const [ headPos, setHeadPos ] = useState({x: 3, y: 3});
 
     const move = () => {
@@ -55,11 +53,18 @@ export default ({colCount = 0, rowCount = 0}) => {
     const handleKeydown = (e) => {
       if(KEY_MAP.hasOwnProperty(e.keyCode)) {
         const curXY = getXY(direction);
-        const nextXY = getXY(KEY_MAP[e.keyCode]);
+        const updateDirection = KEY_MAP[e.keyCode];
+        const nextXY = getXY(updateDirection);
   
         /** 只能左/右 90度轉彎 */
         if(curXY !== nextXY) {
-          direction = KEY_MAP[e.keyCode];
+          isd270to360 = direction === 'LEFT' && updateDirection === 'UP';
+          isd360to270 = direction === 'UP' && updateDirection === 'LEFT';
+          setTimeout(() => {
+            isd270to360 = false;
+            isd360to270 = false;
+          }, duration);
+          direction = updateDirection;
           move();
         }
 
@@ -121,7 +126,9 @@ export default ({colCount = 0, rowCount = 0}) => {
         style={{ left, top }}
         className={cx(style.SnakeWrapper, style[GAME_STATUS])}
       >
-        <div className={cx(style.head, style[direction])} />
+        {!isd270to360 && !isd360to270 && <div className={cx( style.head, style[direction] )} /> }
+        {isd270to360 && <div className={cx( style.d270to360 )} /> }
+        {isd360to270 && <div className={cx( style.d360to270 )} /> }
         {bodyArr.map((part, i) =>
           <div
             key={i}

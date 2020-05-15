@@ -2,6 +2,16 @@ $boxLen: 50;
 $duration: 500;
 $snakeLen: $boxLen;
 
+@keyframes d270to360 {
+  from {transform: rotate(270deg);}
+  to {transform: rotate(360deg);}
+}
+
+@keyframes d360to270 {
+  from {transform: rotate(360deg);}
+  to {transform: rotate(270deg);}
+}
+
 @keyframes opacity {
   from {opacity: 0;}
   to {opacity: 1;}
@@ -10,6 +20,16 @@ $snakeLen: $boxLen;
 :export {
   boxLen: $boxLen;
   duration: $duration;
+}
+
+@mixin head() {
+  position: absolute;
+  width: #{$snakeLen}px;
+  height: #{$snakeLen}px;
+  background-color: #7a5151;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  transition: left #{$duration}ms linear, top #{$duration}ms linear, transform #{$duration}ms linear;
 }
 
 .SnakeWrapper {
@@ -23,24 +43,27 @@ $snakeLen: $boxLen;
     animation-duration: .3s;
   }
   .head {
-    // top: 50%;
-    // left: 50%;
-    width: #{$snakeLen}px;
-    height: #{$snakeLen}px;
-    position: absolute;
-    background-color: #7a5151;
-    // transform: translate(-50%, -50%);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    @include head;
     &.RIGHT { transform: rotate(90deg); }
     &.UP { transform: rotate(0deg); }
-    &.LEFT { transform: rotate(-90deg); }
+    &.LEFT { transform: rotate(270deg); }
     &.DOWN { transform: rotate(180deg); }
     // &.UP { top: 0%; transform: translate(-50%, 0%); }
     // &.DOWN { top: 100%; transform: translate(-50%, -100%); }
     // &.LEFT { left: 0%; transform: translate(0%, -50%); }
     // &.RIGHT { left: 100%; transform: translate(-100%, -50%); }
-    transition: left #{$duration}ms linear, top #{$duration}ms linear, transform #{$duration}ms linear;
+  }
+  .d270to360 {
+    @include head;
+    transform: rotate(270deg);
+    animation: d270to360 #{$duration}ms linear;
+    animation-fill-mode: forwards;
+  }
+  .d360to270 {
+    @include head;
+    transform: rotate(360deg);
+    animation: d360to270 #{$duration}ms linear;
+    animation-fill-mode: forwards;
   }
   .body {
     position: absolute;
