@@ -21,23 +21,35 @@ let moveInterval = null;
 const getD = direction => direction ? ['LEFT', 'UP'].includes(direction) ? -1: 1: 0;
 const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y': '';
 
+const INIT_LEN = 1;
 /** [{x, y, direction}] */
 let bodyArr = [];
 let isd270to360 = false;
 let isd360to270 = false;
 
-const resetBody = () => {
-  direction = 'RIGHT';
-  bodyArr = [
-    {x: 2, y: 3, direction: 'RIGHT'}
-  ];
-};
-
 export default ({colCount = 0, rowCount = 0}) => {
+
+  const resetSnake = setHeadPos => {
+    const newXY = {
+      x: ~~(Math.random() * (colCount - 6)) + 3,
+      y: ~~(Math.random() * (rowCount - 6)) + 3,
+    };
+    setHeadPos({...newXY});
+    direction = Object.values(KEY_MAP)[~~(Math.random() * 4)];
+    bodyArr = [...Array(INIT_LEN).keys()].map(value => ({
+      ...newXY,
+      [getXY(direction)]: newXY[getXY(direction)] - getD(direction) * (value + 1),
+      direction,
+    }));
+    // bodyArr = [
+    //   {x: 2, y: 3, direction}
+    // ];
+  };
+
   return function Snake({ state, send }) {
 
     const GAME_STATUS = state.str(true);
-    const [ headPos, setHeadPos ] = useState({x: 3, y: 3});
+    const [ headPos, setHeadPos ] = useState({x: 0, y: 0});
 
     const move = () => {
       const D = getD(direction);
@@ -76,10 +88,6 @@ export default ({colCount = 0, rowCount = 0}) => {
         else if (state.at(STATUS.GAME.GAMEOVER)) send(STATUS.GAME.READY);
       }
     };
-
-    useEffect(() => {
-      resetBody();
-    }, []);
     
     useEffect(() => {
       window.addEventListener('keydown', handleKeydown);
@@ -91,7 +99,7 @@ export default ({colCount = 0, rowCount = 0}) => {
     useEffect(() => {
       if(state.at(STATUS.GAME.READY)) {
         setHeadPos({x: 3, y: 3});
-        resetBody();
+        resetSnake(setHeadPos);
       }
       else if(state.at(STATUS.GAME.PLAYING)) {
         move();
