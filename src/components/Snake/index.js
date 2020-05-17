@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { STATUS, ACTION } from 'consts';
 
@@ -21,7 +21,7 @@ let moveInterval = null;
 const getD = direction => direction ? ['LEFT', 'UP'].includes(direction) ? -1: 1: 0;
 const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y': '';
 
-const INIT_LEN = 1;
+const INIT_LEN = 10;
 /** [{x, y, direction}] */
 let bodyArr = [];
 let isd270to360 = false;
@@ -41,9 +41,6 @@ export default ({colCount = 0, rowCount = 0}) => {
       [getXY(direction)]: newXY[getXY(direction)] - getD(direction) * (value + 1),
       direction,
     }));
-    // bodyArr = [
-    //   {x: 2, y: 3, direction}
-    // ];
   };
 
   return function Snake({ state, send }) {
@@ -56,6 +53,10 @@ export default ({colCount = 0, rowCount = 0}) => {
       const XY = getXY(direction);
       
       setHeadPos(headPos => {
+        for (let i = bodyArr.length - 1; i > 0; i--) {
+          bodyArr[i] = {...bodyArr[i - 1]};
+        }
+        
         bodyArr[0] = { ...headPos, direction };
         headPos[XY] += D;
         return {...headPos};
@@ -77,7 +78,7 @@ export default ({colCount = 0, rowCount = 0}) => {
             isd360to270 = false;
           }, duration);
           direction = updateDirection;
-          move();
+          // move();
         }
 
         send(ACTION.GAME.PLAY);
@@ -134,13 +135,18 @@ export default ({colCount = 0, rowCount = 0}) => {
         style={{ left, top }}
         className={cx(style.SnakeWrapper, style[GAME_STATUS])}
       >
-        {!isd270to360 && !isd360to270 && <div className={cx( style.head, style[direction] )} /> }
-        {isd270to360 && <div className={cx( style.d270to360 )} /> }
-        {isd360to270 && <div className={cx( style.d360to270 )} /> }
+        {
+          isd270to360 && <div className={cx(style.d270to360)} /> ||
+          isd360to270 && <div className={cx(style.d360to270)} /> ||
+          <div className={cx(style.head, style[direction])} />
+        }
         {bodyArr.map((part, i) =>
           <div
             key={i}
-            className={style.body}
+            className={cx(
+              style.body,
+              // style[part.direction]
+            )}
             style={{
               top:  (part.y - headPos.y) * boxLen,
               left: (part.x - headPos.x) * boxLen,
