@@ -21,13 +21,23 @@ let moveInterval = null;
 const getD = direction => direction ? ['LEFT', 'UP'].includes(direction) ? -1: 1: 0;
 const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y': '';
 
-const INIT_LEN = 10;
+const INIT_LEN = 5;
 /** [{x, y, direction}] */
 let bodyArr = [];
 let isd270to360 = false;
 let isd360to270 = false;
 
 export default ({colCount = 0, rowCount = 0}) => {
+
+  const isBump = headPos => {
+    return (
+      headPos.x < 0 ||
+      headPos.y < 0 ||
+      headPos.x >= colCount ||
+      headPos.y >= rowCount ||
+      bodyArr.some(part => part.x === headPos.x && part.y === headPos.y)
+    );
+  };
 
   const resetSnake = setHeadPos => {
     const newXY = {
@@ -57,7 +67,7 @@ export default ({colCount = 0, rowCount = 0}) => {
           bodyArr[i] = {...bodyArr[i - 1]};
         }
         
-        bodyArr[0] = { ...headPos, direction };
+        if(bodyArr.length) bodyArr[0] = { ...headPos, direction };
         headPos[XY] += D;
         return {...headPos};
       });
@@ -112,7 +122,7 @@ export default ({colCount = 0, rowCount = 0}) => {
 
     // 判斷邊界, 還要判斷是否碰到蛇身體
     useEffect(() => {
-      if(headPos.x < 0 || headPos.y < 0 || headPos.x >= colCount || headPos.y >= rowCount) {
+      if(isBump(headPos)) {
         const D = getD(direction);
         const XY = getXY(direction);
         // setHeadPos[XY](value => value - D);
@@ -127,8 +137,12 @@ export default ({colCount = 0, rowCount = 0}) => {
     const top = headPos.y * boxLen;
     const left = headPos.x * boxLen;
 
-    if(bodyArr.length)
-      console.log(`(${headPos.x},${headPos.y})<-(${bodyArr[0].x},${bodyArr[0].y})`);  
+    if(bodyArr.length) {
+      console.log(
+        `(${headPos.x},${headPos.y})<-`+
+        bodyArr.map(part => `(${part.x}, ${part.y})`).join('<-')
+      );
+    }
 
     return (
       <div

@@ -21,12 +21,16 @@ export function SingleGamePage({ state, send }) {
   const handleResize = () => {
     const colCount = ~~(singleGamePageDOM.current.offsetWidth / boxLen);
     const rowCount = ~~((singleGamePageDOM.current.offsetHeight - headerDOM.current.offsetHeight) / boxLen);
-    setGridSize({
-      colCount,
-      rowCount,
+    
+    setGridSize(gridSize => {
+      if(colCount !== gridSize.colCount || rowCount !== gridSize.rowCount) {
+        Snake = createSnake({ colCount, rowCount });
+      }
+      return {
+        colCount,
+        rowCount,
+      };
     });
-
-    Snake = createSnake({ colCount, rowCount });
   };
 
   useEffect(() => {
