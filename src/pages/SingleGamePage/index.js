@@ -6,6 +6,25 @@ import createSnake, { boxLen } from 'components/Snake';
 import style from './style.module.scss';
 
 let Snake = null;
+let fruitPos = {x: 3, y: 3};
+
+const resetFrultPos = ({ snakePosArr, rowCount, colCount }) => {
+  const grid = [...Array(rowCount * colCount).keys()].map(v => ({
+    x: ~~(v / colCount),
+    y: v % colCount,
+  })).filter(curPos =>
+    !snakePosArr.some(snakePos =>
+      snakePos.x === curPos.x && snakePos.y === curPos.y
+    )
+  );
+  console.log('new location', grid[~~(Math.random() * grid.length)]);
+};
+
+const checkEat = ({ snakePosArr, rowCount, colCount }) => {
+  return snakePosArr.some(snakePos =>
+    snakePos.x === fruitPos.x && snakePos.y === fruitPos.y
+  );
+};
 
 export function SingleGamePage({ state, send }) {
 
@@ -67,6 +86,7 @@ export function SingleGamePage({ state, send }) {
         {Snake && <Snake {...{
           send,
           state,
+          checkEat,
         }} />}
       </div>
     </div>

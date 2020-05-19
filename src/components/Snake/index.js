@@ -21,7 +21,7 @@ let moveInterval = null;
 const getD = direction => direction ? ['LEFT', 'UP'].includes(direction) ? -1: 1: 0;
 const getXY = direction => direction ? ['LEFT', 'RIGHT'].includes(direction) ? 'x': 'y': '';
 
-const INIT_LEN = 5;
+const INIT_LEN = 1;
 /** [{x, y, direction}] */
 let bodyArr = [];
 let isd270to360 = false;
@@ -50,10 +50,10 @@ export default ({colCount = 0, rowCount = 0}) => {
       ...newXY,
       [getXY(direction)]: newXY[getXY(direction)] - getD(direction) * (value + 1),
       direction,
-    }));
+    }));    
   };
 
-  return function Snake({ state, send }) {
+  return function Snake({ state, send, checkEat }) {
 
     const GAME_STATUS = state.str(true);
     const [ headPos, setHeadPos ] = useState({x: 0, y: 0});
@@ -69,6 +69,15 @@ export default ({colCount = 0, rowCount = 0}) => {
         
         if(bodyArr.length) bodyArr[0] = { ...headPos, direction };
         headPos[XY] += D;
+        const a = checkEat({
+          rowCount,
+          colCount,
+          snakePosArr: [headPos, ...bodyArr],
+        });
+
+        console.log('checkEat', a);
+        
+        
         return {...headPos};
       });
     };
