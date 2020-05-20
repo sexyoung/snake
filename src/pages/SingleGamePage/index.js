@@ -6,25 +6,6 @@ import createSnake, { boxLen } from 'components/Snake';
 import style from './style.module.scss';
 
 let Snake = null;
-let fruitPos = {x: 3, y: 3};
-
-const resetFrultPos = ({ snakePosArr, rowCount, colCount }) => {
-  const grid = [...Array(rowCount * colCount).keys()].map(v => ({
-    x: ~~(v / colCount),
-    y: v % colCount,
-  })).filter(curPos =>
-    !snakePosArr.some(snakePos =>
-      snakePos.x === curPos.x && snakePos.y === curPos.y
-    )
-  );
-  console.log('new location', grid[~~(Math.random() * grid.length)]);
-};
-
-const checkEat = ({ snakePosArr, rowCount, colCount }) => {
-  return snakePosArr.some(snakePos =>
-    snakePos.x === fruitPos.x && snakePos.y === fruitPos.y
-  );
-};
 
 export function SingleGamePage({ state, send }) {
 
@@ -37,12 +18,39 @@ export function SingleGamePage({ state, send }) {
     rowCount: 0,
   });
 
+  const [fruitPos, setFruitPos] = useState({x: 3, y: 3});
+
+  const resetFrultPos = ({ snakePosArr, rowCount, colCount }) => {
+    const grid = [...Array(rowCount * colCount).keys()].map(v => ({
+      x: ~~(v / colCount),
+      y: v % colCount,
+    })).filter(curPos =>
+      !snakePosArr.some(snakePos =>
+        snakePos.x === curPos.x && snakePos.y === curPos.y
+      )
+    );
+    setFruitPos({...grid[~~(Math.random() * grid.length)]});
+  };
+  
+  const checkEat = ({ snakePosArr, rowCount, colCount }) => {
+    const [ headPos ] = snakePosArr;
+  
+    console.log('check!');
+    
+    // 如果吃到水果那就要更新水果的位置
+    if(headPos.x === fruitPos.x && headPos.y === fruitPos.y) {
+      resetFrultPos({ snakePosArr, rowCount, colCount });
+    }
+  };
+
   const handleResize = () => {
     const colCount = ~~(singleGamePageDOM.current.offsetWidth / boxLen);
     const rowCount = ~~((singleGamePageDOM.current.offsetHeight - headerDOM.current.offsetHeight) / boxLen);
     
     setGridSize(gridSize => {
       if(colCount !== gridSize.colCount || rowCount !== gridSize.rowCount) {
+        console.log('!:');
+        
         Snake = createSnake({ colCount, rowCount });
       }
       return {
@@ -60,6 +68,9 @@ export function SingleGamePage({ state, send }) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  console.log('fruitPos', fruitPos);
+  
 
   return (
     <div className={style.SingleGamePage} ref={singleGamePageDOM}>
@@ -88,6 +99,15 @@ export function SingleGamePage({ state, send }) {
           state,
           checkEat,
         }} />}
+        {fruitPos &&
+          <div
+            style={{
+              top: fruitPos.y * boxLen,
+              left: fruitPos.x * boxLen,
+            }}
+            className={style.fruit}
+          />
+        }
       </div>
     </div>
   );

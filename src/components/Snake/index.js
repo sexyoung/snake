@@ -69,14 +69,11 @@ export default ({colCount = 0, rowCount = 0}) => {
         
         if(bodyArr.length) bodyArr[0] = { ...headPos, direction };
         headPos[XY] += D;
-        const a = checkEat({
+        checkEat({
           rowCount,
           colCount,
           snakePosArr: [headPos, ...bodyArr],
         });
-
-        console.log('checkEat', a);
-        
         
         return {...headPos};
       });
@@ -146,12 +143,12 @@ export default ({colCount = 0, rowCount = 0}) => {
     const top = headPos.y * boxLen;
     const left = headPos.x * boxLen;
 
-    if(bodyArr.length) {
-      console.log(
-        `(${headPos.x},${headPos.y})<-`+
-        bodyArr.map(part => `(${part.x}, ${part.y})`).join('<-')
-      );
-    }
+    // if(bodyArr.length) {
+    //   console.log(
+    //     `(${headPos.x},${headPos.y})<-`+
+    //     bodyArr.map(part => `(${part.x}, ${part.y})`).join('<-')
+    //   );
+    // }
 
     return (
       <div
